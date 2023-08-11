@@ -18,9 +18,9 @@
           pending: invoice.invoicePending,
         }"
       >
-        <span v-if="invoice.invoicePaid">Paid</span>
-        <span v-if="invoice.invoiceDraft">Draft</span>
-        <span v-if="invoice.invoicePending">Pending</span>
+        <span v-if="invoice.invoicePaid">付清</span>
+        <span v-if="invoice.invoiceDraft">草稿</span>
+        <span v-if="invoice.invoicePending">待办</span>
       </div>
       <div class="icon">
         <img src="../assets/icon-arrow-right.svg" alt="" />

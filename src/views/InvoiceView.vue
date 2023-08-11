@@ -1,7 +1,7 @@
 <template>
   <div v-if="currentInvoice" class="invoice-view container">
     <router-link class="nav-link flex" :to="{ name: 'Home' }">
-      <img src="../assets/icon-arrow-left.svg" alt="" /> Go Back
+      <img src="../assets/icon-arrow-left.svg" alt="" /> 返回
     </router-link>
     <!-- Header -->
     <div class="header flex">
@@ -15,34 +15,31 @@
             pending: currentInvoice.invoicePending,
           }"
         >
-          <span v-if="currentInvoice.invoicePaid">Paid</span>
-          <span v-if="currentInvoice.invoiceDraft">Draft</span>
-          <span v-if="currentInvoice.invoicePending">Pending</span>
+          <span v-if="currentInvoice.invoicePaid">付清</span>
+          <span v-if="currentInvoice.invoiceDraft">草稿</span>
+          <span v-if="currentInvoice.invoicePending">待办</span>
         </div>
       </div>
       <div class="right flex">
-        <button
-          @click="toggleEditInvoice(currentInvoice.docId)"
-          class="dark-purple"
-        >
-          Edit
+        <button @click="toggleEditInvoice" class="dark-purple">
+          编辑
         </button>
-        <button @click="deleteEditInvoice(currentInvoice.docId)" class="red">
-          Delete
+        <button @click="deleteInvoice(currentInvoice.docId)" class="red">
+          删除
         </button>
         <button
           v-if="currentInvoice.invoicePending"
           @click="updateStatusToPaid(currentInvoice.docId)"
           class="green"
         >
-          Mark as Paid
+          标为付清
         </button>
         <button
           v-if="currentInvoice.invoiceDraft || currentInvoice.invoicePaid"
           @click="updateStatusToPending(currentInvoice.docId)"
           class="orange"
         >
-          Mark as Pending
+          标为待办
         </button>
       </div>
     </div>
@@ -63,13 +60,13 @@
       </div>
       <div class="middle flex">
         <div class="payment flex flex-column">
-          <h4>Invoice Date</h4>
+          <h4>账单日期</h4>
           <p>{{ currentInvoice.invoiceDate }}</p>
-          <h4>Payment Date</h4>
+          <h4>账单到期日</h4>
           <p>{{ currentInvoice.paymentDueDate }}</p>
         </div>
         <div class="bill flex flex-column">
-          <h4>Bill To</h4>
+          <h4>账单来自</h4>
           <p>{{ currentInvoice.clientName }}</p>
           <p>{{ currentInvoice.clientStreetAddress }}</p>
           <p>{{ currentInvoice.clientCity }}</p>
@@ -77,17 +74,17 @@
           <p>{{ currentInvoice.clientCountry }}</p>
         </div>
         <div class="send-to flex flex-column">
-          <h4>Send To</h4>
+          <h4>账单去向</h4>
           <p>{{ currentInvoice.clientEmail }}</p>
         </div>
       </div>
       <div class="bottom flex flex-column">
         <div class="billing-items">
           <div class="heading flex">
-            <p>Item Name</p>
-            <p>QTY</p>
-            <p>Price</p>
-            <p>Total</p>
+            <p>项目名称</p>
+            <p>数量</p>
+            <p>价格</p>
+            <p>总计</p>
           </div>
           <div
             v-for="(item, index) in currentInvoice.invoiceItemList"
@@ -101,7 +98,7 @@
           </div>
         </div>
         <div class="total flex">
-          <p>Amount Due</p>
+          <p>还款金额</p>
           <p>{{ currentInvoice.invoiceTotal }}</p>
         </div>
       </div>
@@ -110,7 +107,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 export default {
   name: "invoiceView",
   data() {
@@ -122,15 +119,49 @@ export default {
     this.getCurrentInvoice();
   },
   methods: {
-    ...mapMutations(["SET_CURRENT_INVOICE"]),
+    ...mapMutations([
+      "SET_CURRENT_INVOICE",
+      "TOGGLE_EDIT_INVOICE",
+      "TOGGLE_INVOICE",
+    ]),
+
+    ...mapActions([
+      "DELETE_INVOICE",
+      "UPDATE_STATUS_TO_PAID",
+      "UPDATE_STATUS_TO_PENDING",
+    ]),
 
     getCurrentInvoice() {
       this.SET_CURRENT_INVOICE(this.$route.params.invoiceId);
       this.currentInvoice = this.currentInvoiceArray[0];
     },
+
+    toggleEditInvoice() {
+      this.TOGGLE_EDIT_INVOICE();
+      this.TOGGLE_INVOICE();
+    },
+
+    async deleteInvoice(docId) {
+      await this.DELETE_INVOICE(docId);
+      this.$router.push({ name: "Home" });
+    },
+
+    updateStatusToPaid(docId) {
+      this.UPDATE_STATUS_TO_PAID(docId);
+    },
+    updateStatusToPending(docId) {
+      this.UPDATE_STATUS_TO_PENDING(docId);
+    },
   },
   computed: {
-    ...mapState(["currentInvoiceArray"]),
+    ...mapState(["currentInvoiceArray", "editInvoice"]),
+  },
+  watch: {
+    editInvoice() {
+      if (!this.editInvoice) {
+        this.currentInvoice = this.currentInvoiceArray[0];
+      }
+    },
   },
 };
 </script>

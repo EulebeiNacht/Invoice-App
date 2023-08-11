@@ -3,41 +3,44 @@
     <!---Header-->
     <div class="header flex">
       <div class="left flex flex-column">
-        <h1>Invoices</h1>
-        <span>There are 4 total invoices</span>
+        <h1>发票</h1>
+        <span>共有 {{ invoiceData.length }} 个发票</span>
       </div>
       <div class="right flex">
         <div @click="toggleFilterMenu" class="flex filter">
-          <span>Filter by status</span>
+          <span
+            >过滤
+            <span v-if="filteredInvoice">: {{ filteredInvoice }}</span></span
+          >
           <img src="../assets/icon-arrow-down.svg" alt="" />
           <ul v-show="filterMenu" class="filter-menu">
-            <li>Draft</li>
-            <li>Pending</li>
-            <li>Paid</li>
-            <li>Clear Filter</li>
+            <li @click="filteredInvoices">草稿</li>
+            <li @click="filteredInvoices">待办</li>
+            <li @click="filteredInvoices">付清</li>
+            <li @click="filteredInvoices">清除过滤</li>
           </ul>
         </div>
         <div @click="newInvoice" class="button flex">
           <div class="inner-button flex">
             <img src="../assets/icon-plus.svg" alt="" />
           </div>
-          <span>New Invoice</span>
+          <span>创建发票</span>
         </div>
       </div>
     </div>
     <!-- Invoices -->
     <div v-if="invoiceData.length > 0">
       <Invoice
-        v-for="(invoice, index) in invoiceData"
+        v-for="(invoice, index) in filteredData"
         v-bind:invoice="invoice"
         :key="index"
       />
     </div>
     <div v-else class="empty flex flex-column">
       <img src="../assets/illustration-empty.svg" alt="" />
-      <h3>There is nothing here</h3>
+      <h3>这里还没有发票</h3>
       <p>
-        Create a new invoice by click the New Invoice button and get started
+        点击“创建发票”创建一个吧！
       </p>
     </div>
   </div>
@@ -51,6 +54,7 @@ export default {
   data() {
     return {
       filterMenu: null,
+      filteredInvoice: null,
     };
   },
   components: {
@@ -58,15 +62,40 @@ export default {
   },
   methods: {
     ...mapMutations(["TOGGLE_INVOICE"]),
+
     newInvoice() {
       this.TOGGLE_INVOICE();
     },
+
     toggleFilterMenu() {
       this.filterMenu = !this.filterMenu;
+    },
+    filteredInvoices(event) {
+      if (event.target.innerText === "清除过滤") {
+        this.filteredInvoice = null;
+        return;
+      }
+
+      this.filteredInvoice = event.target.innerText;
     },
   },
   computed: {
     ...mapState(["invoiceData"]),
+
+    filteredData() {
+      return this.invoiceData.filter((invoice) => {
+        if (this.filteredInvoice === "草稿") {
+          return invoice.invoiceDraft === true;
+        }
+        if (this.filteredInvoice === "待办") {
+          return invoice.invoicePending === true;
+        }
+        if (this.filteredInvoice === "付清") {
+          return invoice.invoicePaid === true;
+        }
+        return invoice;
+      });
+    },
   },
 };
 </script>

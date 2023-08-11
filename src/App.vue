@@ -11,8 +11,8 @@
       </div>
     </div>
     <div v-else class="mobile-message flex flex-column">
-      <h2>Sorry, this app is not supported on Mobile Devices</h2>
-      <p>To use this app, please use acomputer or Tablet</p>
+      <h2>抱歉，这个App不支持手机端使用</h2>
+      <p>请在电脑或web端使用该App</p>
     </div>
   </div>
 </template>

@@ -1,21 +1,21 @@
 <template>
   <div class="modal flex">
     <div class="modal-content">
-      <p>Are you sure you want to exit? Your changes will not be saved?</p>
+      <p>您确定要退出吗？ 您的信息将不会保存。</p>
       <div class="actions flex">
-        <button @click="closeModal" class="purple">Return</button>
-        <button @click="closeInvoice" class="red">Close</button>
+        <button @click="closeModal" class="purple">返回</button>
+        <button @click="closeInvoice" class="red">关闭</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapMutations, mapState } from "vuex";
 export default {
   name: "modal",
   methods: {
-    ...mapMutations(["TOGGLE_MODAL", "TOGGLE_INVOICE"]),
+    ...mapMutations(["TOGGLE_MODAL", "TOGGLE_INVOICE", "TOGGLE_EDIT_INVOICE"]),
 
     closeModal() {
       this.TOGGLE_MODAL();
@@ -24,7 +24,13 @@ export default {
     closeInvoice() {
       this.TOGGLE_MODAL();
       this.TOGGLE_INVOICE();
+      if (this.editInvoice) {
+        this.TOGGLE_EDIT_INVOICE();
+      }
     },
+  },
+  computed: {
+    ...mapState(["editInvoice"]),
   },
 };
 </script>
